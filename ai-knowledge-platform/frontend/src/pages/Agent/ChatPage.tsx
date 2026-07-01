@@ -242,7 +242,7 @@ export default function AgentChatPage() {
         }}>
           <Space>
             {sidebarCollapsed && <Button size="small" type="text" icon={<MenuUnfoldOutlined />} onClick={() => setSidebarCollapsed(false)} />}
-            <RobotOutlined style={{ fontSize: 16, color: '#1677ff' }} />
+            <RobotOutlined style={{ fontSize: 16, color: '#1a1a1a' }} />
             <Text strong style={{ fontSize: 14 }}>{agent?.name || 'AI 助手'}</Text>
             <Text type="secondary" style={{ fontSize: 11 }}>{currentModel ? currentModel.label : ''}</Text>
           </Space>
@@ -259,7 +259,7 @@ export default function AgentChatPage() {
             {messages.length === 0 ? (
               <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <div style={{ textAlign: 'center' }}>
-                  <RobotOutlined style={{ fontSize: 44, color: '#1677ff', marginBottom: 10 }} />
+                  <RobotOutlined style={{ fontSize: 44, color: '#1a1a1a', marginBottom: 10, opacity: 0.6 }} />
                   <h3>{agent?.name || 'AI 助手'}</h3>
                   <Text type="secondary">{agent?.description || '基于知识库的智能问答助手'}</Text>
                 </div>
@@ -268,13 +268,13 @@ export default function AgentChatPage() {
               <div key={idx}>
                 {msg.role === 'user' && (
                   <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                    <div style={{ maxWidth: '75%', background: '#1677ff', color: '#fff', padding: '10px 14px', borderRadius: '10px 10px 4px 10px', fontSize: 14, lineHeight: 1.6, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{msg.content}</div>
-                    <Avatar size={28} icon={<UserOutlined />} style={{ backgroundColor: '#1677ff', marginLeft: 8, flexShrink: 0 }} />
+                    <div style={{ maxWidth: '75%', background: '#1a1a1a', color: '#fff', padding: '10px 14px', borderRadius: '10px 10px 4px 10px', fontSize: 14, lineHeight: 1.6, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{msg.content}</div>
+                    <Avatar size={28} icon={<UserOutlined />} style={{ backgroundColor: '#1a1a1a', marginLeft: 8, flexShrink: 0 }} />
                   </div>
                 )}
                 {msg.role === 'assistant' && (
                   <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-                    <Avatar size={28} icon={<RobotOutlined />} style={{ backgroundColor: '#52c41a', marginRight: 8, flexShrink: 0 }} />
+                    <Avatar size={28} icon={<RobotOutlined />} style={{ backgroundColor: '#555', marginRight: 8, flexShrink: 0 }} />
                     <div style={{ maxWidth: '75%', minWidth: 60 }}>
                       <div style={{
                         background: msg.content?.includes('请求失败') ? '#fff2f0' : '#f7f8fa',

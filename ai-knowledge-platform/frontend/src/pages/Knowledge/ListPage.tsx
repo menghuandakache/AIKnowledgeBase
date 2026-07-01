@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Button, Table, Space, Input, Select, Tag, Modal, message, Dropdown } from 'antd'
 import { PlusOutlined, SearchOutlined, DeleteOutlined, CheckCircleOutlined, MinusCircleOutlined } from '@ant-design/icons'
 import type { TableRowSelection } from 'antd/es/table/interface'
-import { getKnowledgeList, deleteKnowledge, publishKnowledge, disableKnowledge } from '../../api/knowledge'
+import { getKnowledgeList, deleteKnowledge, publishKnowledge, disableKnowledge, batchDeleteKnowledge, batchPublishKnowledge, batchDisableKnowledge } from '../../api/knowledge'
 import { getKnowledgeBases } from '../../api/kb'
 import StatusTag from '../../components/StatusTag'
 import { formatTime } from '../../utils/formatTime'
@@ -20,6 +20,8 @@ export default function KnowledgeListPage() {
   const category = searchParams.get('category') || undefined
   const status = searchParams.get('status') || undefined
   const kbId = searchParams.get('kb_id') || undefined
+  const page = parseInt(searchParams.get('page') || '1', 10)
+  const pageSize = parseInt(searchParams.get('page_size') || '20', 10)
 
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
 
@@ -27,13 +29,15 @@ export default function KnowledgeListPage() {
     const newParams = new URLSearchParams(searchParams)
     if (value) newParams.set(key, value)
     else newParams.delete(key)
+    // Reset page to 1 when filters change
+    if (key !== 'page') newParams.delete('page')
     setSearchParams(newParams, { replace: true })
   }
 
   const { data, isLoading } = useQuery({
-    queryKey: ['knowledge-list', { keyword, category, status, kb_id: kbId }],
+    queryKey: ['knowledge-list', { keyword, category, status, kb_id: kbId, page, page_size: pageSize }],
     queryFn: async () => {
-      const res: any = await getKnowledgeList({ keyword, category, status, kb_id: kbId, page_size: 100 })
+      const res: any = await getKnowledgeList({ keyword, category, status, kb_id: kbId, page, page_size: pageSize })
       return res
     },
   })
@@ -66,14 +70,16 @@ export default function KnowledgeListPage() {
     onSuccess: () => { invalidate(); message.success('删除成功') },
   })
 
-  // Batch operations
+  // Batch operations — use single API call
   const handleBatchPublish = () => {
     Modal.confirm({
       title: '批量发布', content: `确定要发布选中的 ${selectedRowKeys.length} 条知识吗？`,
-      onOk: () => {
-        Promise.all(selectedRowKeys.map(id => publishKnowledge(id)))
-          .then(() => { invalidate(); message.success(`已发布 ${selectedRowKeys.length} 条`) })
-          .catch(() => message.error('部分发布失败'))
+      onOk: async () => {
+        try {
+          const res: any = await batchPublishKnowledge(selectedRowKeys)
+          invalidate()
+          message.success(`成功发布 ${res.success_count} 条` + (res.error_count > 0 ? `，${res.error_count} 条失败` : ''))
+        } catch { message.error('批量发布失败') }
       },
     })
   }
@@ -81,10 +87,12 @@ export default function KnowledgeListPage() {
   const handleBatchDisable = () => {
     Modal.confirm({
       title: '批量停用', content: `确定要停用选中的 ${selectedRowKeys.length} 条知识吗？`,
-      onOk: () => {
-        Promise.all(selectedRowKeys.map(id => disableKnowledge(id)))
-          .then(() => { invalidate(); message.success(`已停用 ${selectedRowKeys.length} 条`) })
-          .catch(() => message.error('部分停用失败'))
+      onOk: async () => {
+        try {
+          const res: any = await batchDisableKnowledge(selectedRowKeys)
+          invalidate()
+          message.success(`成功停用 ${res.success_count} 条` + (res.error_count > 0 ? `，${res.error_count} 条失败` : ''))
+        } catch { message.error('批量停用失败') }
       },
     })
   }
@@ -93,10 +101,12 @@ export default function KnowledgeListPage() {
     Modal.confirm({
       title: '批量删除', content: `确定要删除选中的 ${selectedRowKeys.length} 条知识吗？此操作不可撤销！`,
       okButtonProps: { danger: true }, okText: '删除',
-      onOk: () => {
-        Promise.all(selectedRowKeys.map(id => deleteKnowledge(id)))
-          .then(() => { invalidate(); message.success(`已删除 ${selectedRowKeys.length} 条`) })
-          .catch(() => message.error('部分删除失败'))
+      onOk: async () => {
+        try {
+          const res: any = await batchDeleteKnowledge(selectedRowKeys)
+          invalidate()
+          message.success(`成功删除 ${res.success_count} 条` + (res.error_count > 0 ? `，${res.error_count} 条失败` : ''))
+        } catch { message.error('批量删除失败') }
       },
     })
   }
@@ -188,7 +198,21 @@ export default function KnowledgeListPage() {
         rowKey="id"
         loading={isLoading}
         rowSelection={rowSelection}
-        pagination={{ pageSize: 50, showTotal: (t) => `共 ${t} 条` }}
+        pagination={{
+          current: page,
+          pageSize: pageSize,
+          total: data?.total || 0,
+          showTotal: (t, range) => `共 ${t} 条，当前第 ${range[0]}-${range[1]} 条`,
+          showSizeChanger: true,
+          pageSizeOptions: ['10', '20', '50', '100'],
+          onChange: (p, ps) => {
+            const newParams = new URLSearchParams(searchParams)
+            newParams.set('page', String(p))
+            newParams.set('page_size', String(ps))
+            setSearchParams(newParams, { replace: true })
+            setSelectedRowKeys([])
+          },
+        }}
         scroll={{ x: 1200 }}
       />
     </div>

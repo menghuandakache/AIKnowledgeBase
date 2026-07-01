@@ -28,6 +28,18 @@ export async function disableKnowledge(id: string) {
   return request.patch(`/knowledge/${id}/disable`)
 }
 
+export async function batchDeleteKnowledge(ids: string[]) {
+  return request.post('/knowledge/batch/delete', { ids })
+}
+
+export async function batchPublishKnowledge(ids: string[]) {
+  return request.post('/knowledge/batch/publish', { ids })
+}
+
+export async function batchDisableKnowledge(ids: string[]) {
+  return request.post('/knowledge/batch/disable', { ids })
+}
+
 export async function getKnowledgeChunks(id: string) {
   return request.get(`/knowledge/${id}/chunks`)
 }

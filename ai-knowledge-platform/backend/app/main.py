@@ -22,6 +22,7 @@ from app.api.routes import (
     stats,
     model_config,
     conversation,
+    graph,
 )
 
 settings = get_settings()
@@ -128,3 +129,4 @@ app.include_router(feedback.router, prefix="/api/feedback", tags=["Feedback"])
 app.include_router(stats.router, prefix="/api/stats", tags=["Statistics"])
 app.include_router(model_config.router, prefix="/api/models", tags=["Model Config"])
 app.include_router(conversation.router, prefix="/api/conversations", tags=["Conversations"])
+app.include_router(graph.router, prefix="/api", tags=["Knowledge Graph"])

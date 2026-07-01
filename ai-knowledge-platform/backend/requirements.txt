@@ -29,6 +29,7 @@ openai==1.35.0
 
 # Document Parsing
 PyMuPDF==1.24.9
+pdfplumber==0.9.0
 python-docx==1.1.2
 markdown==3.6.0
 

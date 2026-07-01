@@ -55,7 +55,7 @@ export default function Dashboard() {
         </Col>
         <Col xs={12} sm={6}>
           <Card>
-            <Statistic title="点赞数" value={stats?.like_count || 0} prefix={<LikeOutlined />} valueStyle={{ color: '#1677ff' }} />
+            <Statistic title="点赞数" value={stats?.like_count || 0} prefix={<LikeOutlined />} valueStyle={{ color: '#1a1a1a' }} />
           </Card>
         </Col>
       </Row>

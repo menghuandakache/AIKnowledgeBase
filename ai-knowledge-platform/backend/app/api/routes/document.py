@@ -19,6 +19,7 @@ from app.core.exceptions import NotFoundException, ValidationException
 from app.tasks.document_tasks import parse_document_task
 from app.services.parser_service import ParserService
 from app.services.chunk_service import ChunkService
+from app.utils.text_cleaner import clean_pdf_text
 
 router = APIRouter()
 
@@ -97,6 +98,11 @@ async def parse_document(
             chunk_service = ChunkService()
 
             text = parser.parse(doc.file_path, doc.file_type)
+
+            # Apply PDF-specific text cleaning
+            if doc.file_type == "pdf" and text:
+                text = clean_pdf_text(text)
+
             chunks = chunk_service.split_text(text, method=request.chunk_method)
 
             draft_ids = []

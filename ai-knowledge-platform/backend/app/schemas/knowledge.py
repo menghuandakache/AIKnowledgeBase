@@ -64,6 +64,21 @@ class KnowledgeListResponse(BaseModel):
     page_size: int
 
 
+class BatchDeleteRequest(BaseModel):
+    ids: list[str] = Field(..., min_length=1, max_length=500)
+
+
+class BatchOperationError(BaseModel):
+    id: str
+    error: str
+
+
+class BatchOperationResponse(BaseModel):
+    success_count: int
+    error_count: int
+    errors: list[BatchOperationError] = []
+
+
 class ChunkResponse(BaseModel):
     id: str
     knowledge_id: str

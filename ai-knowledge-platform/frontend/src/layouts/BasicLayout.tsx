@@ -90,18 +90,21 @@ export default function BasicLayout() {
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
-      <Sider trigger={null} collapsible collapsed={collapsed} theme="dark">
+      <Sider trigger={null} collapsible collapsed={collapsed}
+        style={{ background: '#1a1a1a' }}
+        theme="dark">
         <div style={{
-          height: 64,
+          height: 56,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           color: '#fff',
-          fontSize: collapsed ? 16 : 18,
-          fontWeight: 'bold',
-          borderBottom: '1px solid rgba(255,255,255,0.1)',
+          fontSize: collapsed ? 16 : 17,
+          fontWeight: 600,
+          letterSpacing: 1,
+          borderBottom: '1px solid rgba(255,255,255,0.08)',
         }}>
-          <BookOutlined style={{ marginRight: collapsed ? 0 : 8 }} />
+          <BookOutlined style={{ marginRight: collapsed ? 0 : 8, fontSize: collapsed ? 16 : 18 }} />
           {!collapsed && 'AI知识库'}
         </div>
         <Menu
@@ -156,12 +159,13 @@ export default function BasicLayout() {
           <Breadcrumb items={breadcrumbItems} />
         </div>
         <Content style={{
-          margin: '12px 24px 24px',
-          padding: 24,
-          background: colorBgContainer,
+          margin: '16px 24px 24px',
+          padding: 28,
+          background: '#fff',
           borderRadius: borderRadiusLG,
           minHeight: 280,
           overflow: 'auto',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
         }}>
           <Outlet />
         </Content>

@@ -6,6 +6,7 @@ from app.services.parser_service import ParserService
 from app.services.chunk_service import ChunkService
 from app.repositories.document_repo import DocumentRepository
 from app.repositories.knowledge_repo import KnowledgeRepository
+from app.utils.text_cleaner import clean_pdf_text
 
 settings = get_settings()
 
@@ -29,6 +30,10 @@ def parse_document_task(self, document_id: str, user_id: str = None, chunk_metho
 
         # Parse document
         text = parser.parse(doc.file_path, doc.file_type)
+
+        # Apply PDF-specific text cleaning
+        if doc.file_type == "pdf" and text:
+            text = clean_pdf_text(text)
 
         # Split into chunks using the specified method
         chunks = chunk_service.split_text(text, method=chunk_method)

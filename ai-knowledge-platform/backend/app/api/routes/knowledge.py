@@ -8,6 +8,7 @@ from app.models.user import User
 from app.schemas.knowledge import (
     KnowledgeCreate, KnowledgeUpdate,
     KnowledgeResponse, KnowledgeListResponse, ChunkResponse,
+    BatchDeleteRequest, BatchOperationResponse,
 )
 from app.services.knowledge_service import KnowledgeService
 
@@ -21,7 +22,7 @@ async def list_knowledge(
     category: str = Query(None),
     status: str = Query(None),
     page: int = Query(1, ge=1),
-    page_size: int = Query(20, ge=1, le=100),
+    page_size: int = Query(20, ge=1, le=200),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
@@ -119,3 +120,60 @@ async def get_knowledge_chunks(
     """Get chunks for a knowledge item."""
     service = KnowledgeService(db)
     return service.get_chunks(knowledge_id)
+
+
+@router.post("/batch/delete", response_model=BatchOperationResponse)
+async def batch_delete_knowledge(
+    request: BatchDeleteRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_admin),
+):
+    """Batch soft-delete knowledge items."""
+    service = KnowledgeService(db)
+    deleted = 0
+    errors = []
+    for kid in request.ids:
+        try:
+            service.delete(kid)
+            deleted += 1
+        except Exception as e:
+            errors.append({"id": kid, "error": str(e)})
+    return {"success_count": deleted, "error_count": len(errors), "errors": errors}
+
+
+@router.post("/batch/publish", response_model=BatchOperationResponse)
+async def batch_publish_knowledge(
+    request: BatchDeleteRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_admin),
+):
+    """Batch publish knowledge items."""
+    service = KnowledgeService(db)
+    published = 0
+    errors = []
+    for kid in request.ids:
+        try:
+            service.publish(kid)
+            published += 1
+        except Exception as e:
+            errors.append({"id": kid, "error": str(e)})
+    return {"success_count": published, "error_count": len(errors), "errors": errors}
+
+
+@router.post("/batch/disable", response_model=BatchOperationResponse)
+async def batch_disable_knowledge(
+    request: BatchDeleteRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_admin),
+):
+    """Batch disable knowledge items."""
+    service = KnowledgeService(db)
+    disabled = 0
+    errors = []
+    for kid in request.ids:
+        try:
+            service.disable(kid)
+            disabled += 1
+        except Exception as e:
+            errors.append({"id": kid, "error": str(e)})
+    return {"success_count": disabled, "error_count": len(errors), "errors": errors}

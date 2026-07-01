@@ -43,6 +43,7 @@ export default function DocumentImportPage() {
   // Chunk method options
   const chunkMethodOptions = [
     { value: 'auto', label: '自动检测（推荐）' },
+    { value: 'cn', label: '中文文档结构（第X章/X.X节）' },
     { value: 'h1', label: 'Markdown 一级标题（#）' },
     { value: 'h2', label: 'Markdown 二级标题（##）' },
     { value: 'h3', label: 'Markdown 三级标题（###）' },
